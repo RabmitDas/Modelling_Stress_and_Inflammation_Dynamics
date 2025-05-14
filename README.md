@@ -1,41 +1,64 @@
 # Modelling Stress and Inflammation Dynamics
 
-**1> LVmodel.py**
+This repository contains the mathematical models, simulations, and correlation analyses used to investigate the dynamic interplay between stress-related and inflammation-related metabolites, along with microbiome-metabolite associations.
 
-Our stress/inflammation dynamics model consists of two differential equations where variables represent pro-inflammatory/pro-stress response (X) and anti-inflammatory/anti-stress metabolites (Y), inspired by the Lotka-Volterra predator-prey model but applied to inflammatory feedback mechanisms:
+## 📁 Contents
 
-dX/dt = AX - BXY ------------------------------ (1)
+- **LVmodel.py** – Implements a Lotka-Volterra-inspired model of stress and inflammation dynamics.
+- **VDPmodel.py** – Implements the Van der Pol oscillator model for non-convergent, non-linear dynamics.
+- **Correlation.py** – Performs Spearman Rank Correlation analysis between microbiome taxa and metabolite abundances.
+  
+---
 
-dY/dt = -CY + DXY	----------------------------- (2)
+## 📈 1. Lotka-Volterra Model (`LVmodel.py`)
 
-Where:\
-A = basal production rate of pro-inflammatory/pro-stress metabolites\
-B = inhibitory effect of anti-inflammatory/anti-stress metabolites\
-C = basal removal rate of anti-inflammatory/anti-stress metabolites\
-D = activation effect of pro-inflammatory/pro-stress metabolites
+This model consists of two coupled differential equations:
 
-The time-independent form is:
+dX/dt = A·X - B·X·Y      \
+dY/dt = -C·Y + D·X·Y    
 
-Aln(Y) - BY + Cln(X) - DX = 0 ----------------- (3)
+Where:
+- `X`: Pro-inflammatory or pro-stress component
+- `Y`: Anti-inflammatory or anti-stress component
+- `A`: Basal production rate of `X`
+- `B`: Inhibitory effect of `Y` on `X`
+- `C`: Basal removal rate of `Y`
+- `D`: Activation effect of `X` on `Y`
 
-We derived constants A, B, C, and D using average abundances of metabolites from Table 2 and optimized with Scikit-learn. 
+We also solved for the steady-state using the time-independent formulation:
 
+Aln(Y) - BY + Cln(X) - DX = 0
 
-**2> VDPmodel.py**
+Model constants were derived using average metabolite abundances and optimized using `scikit-learn`.
 
-When constant values failed to converge, indicating non-periodic oscillations, we applied the Van der Pol model:
+---
 
-x" - μ(1-x²)x' + x = 0 ------------------------ (4)
+## 🔁 2. Van der Pol Oscillator (`VDPmodel.py`)
 
-x' = y	--------------------------------------- (5)
+In cases where Lotka-Volterra dynamics failed to converge (i.e., non-periodic or damped oscillations), we applied the Van der Pol oscillator:
 
-Data was normalized between -1 and 1 to optimize μ, which controls damping. 
+x'' - μ·(1 - x²)·x' + x = 0     
 
-Phase portraits were plotted for all conditions using the respective ODE systems and derived constants using the Matplotlib package. 
+Where `μ` controls the damping behavior. Variables were normalized between -1 and 1. First-order ODEs were used:
 
+x' = y
 
-# Microbiome-Metabolite Correlation
+Phase portraits were plotted using `matplotlib`.
 
-**Correlation.py**
+---
 
-The collected metabolite and microbiome data was loaded into pandas DataFrames, and performed A Spearman Rank Correlation analysis using scipy.stats.spearmanr to assess relationships between metabolites and microbiome taxa, with results stored in a correlation matrix. We filtered correlations with absolute values between 0.8 and 1.0 for further analysis.
+## 🧬 3. Microbiome-Metabolite Correlation (`Correlation.py`)
+
+- Input: DataFrames containing metabolite levels and microbial abundances.
+- Method: Spearman Rank Correlation (`scipy.stats.spearmanr`)
+- Output: Correlation matrix
+- Filter: Correlations with |r| ≥ 0.8 were retained for interpretation.
+
+---
+
+## 🔧 Requirements
+
+Install dependencies using pip:
+
+```bash
+pip install numpy pandas matplotlib scikit-learn
